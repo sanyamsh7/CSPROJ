@@ -1,0 +1,5 @@
+{
+    "db_hostName": "localhost",
+	"db_portNumber": 27021,
+	"databaseName": "CSPROJ_DB",
+}

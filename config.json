@@ -1,0 +1,17 @@
+{
+    "sample_file_name": "CS_27022022_165800.csv",
+    "dateStamplen": 8,
+    "timeStampelen": 6,
+    "numberOfCol": 9,
+    "colNames": {
+                "Cement_component_1": "FLOAT",
+                "Blast_Furnace_Slag_component_2": "FLOAT",
+                "Fly_Ash_component_3": "FLOAT",
+                "Water_component_4": "FLOAT",
+                "Superplasticizer_component_5": "FLOAT",
+                "Coarse_Aggregate_component_6": "FLOAT",
+                "Fine_Aggregate_component_7": "FLOAT",
+                "Age_day": "INTEGER",
+                "Concrete_compressive_strength": "FLOAT"
+                }
+}
