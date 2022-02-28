@@ -19,13 +19,9 @@ class ValidateRawData:
     def __init__(self, path):
         self.BatchDir = path
         self.config = "../config.json"
-        # self.workDir = os.getcwd()
-        # self.currentDir = "/Validation"
         
     def configValues(self):
         try:
-            
-            os.chdir(self.workDir)
             with open(self.config, 'r') as file:
                 dic = json.load(file)
             
@@ -61,11 +57,11 @@ class ValidateRawData:
     def creatDirGoodBadRaw(self):
         try:
             print("Creating Good / Bad directories")
-            path = os.path.join("Training_Raw_files/", "Good_Raw/")
+            path = os.path.join("Validation/Training_Raw_files/", "Good_Raw/")
             if not os.path.isdir(path):
                 os.makedirs(path)
             
-            path = os.path.join("Training_Raw_files/", "Bad_Raw/")
+            path = os.path.join("Validation/Training_Raw_files/", "Bad_Raw/")
             if not os.path.isdir(path):
                 os.makedirs(path)
         
@@ -77,7 +73,7 @@ class ValidateRawData:
     
     def delExistingGoodDataDir(self):
         try:
-            path = 'Training_Raw_files/'
+            path = 'Validation/Training_Raw_files/'
             if os.path.isdir(path+ 'Good_Raw/'):
                 shutil.rmtree(path+ 'Good_Raw/')
                 print("Good_Raw directory deleted successfully")
@@ -90,7 +86,7 @@ class ValidateRawData:
             
     def delExistingBadDataDir(self):
         try:
-            path = 'Training_Raw_files/'
+            path = 'Validation/Training_Raw_files/'
             if os.path.isdir(path+ 'Bad_Raw/'):
                 shutil.rmtree(path+ 'Bad_Raw/')
                 print("Bad_Raw directory deleted successfully")
@@ -102,18 +98,19 @@ class ValidateRawData:
             raise OSError
             
     def moveBadFilesToBadArchive(self):
+        print("moving bad files to bad archives")
         now = datetime.now()
         date = now.date()
         time = now.strftime("%H%M%S")
         try:
             
-            source = "Training_Raw_files/Bad_Raw/"
+            source = "Validation/Training_Raw_files/Bad_Raw/"
             if os.path.isdir(source):
                 path = "BadTrainingArchives"
                 if not os.path.isdir(path):
                     os.makedirs(path)
                     
-                dest = "BadTrainingArchives/BadData_" + str(date)+"_"+str(time)
+                dest = "Validation/BadTrainingArchives/BadData_" + str(date)+"_"+str(time)
                 if not os.path.isdir(dest):
                     os.makedirs(dest)
                 
@@ -131,6 +128,7 @@ class ValidateRawData:
             print("Error while moving bad files to archive folder")
             
     def validateRawFileName(self, regex, dateStamplen, timeStampelen):
+        print("Validating raw file names")
         self.delExistingBadDataDir()
         self.delExistingGoodDataDir()
 
@@ -144,17 +142,17 @@ class ValidateRawData:
                     undSplit = re.split('_', dotSplit[0])
                     if len(undSplit[1]) == dateStamplen:
                         if len(undSplit[2]) == timeStampelen:
-                            shutil.copy("Training_Batch_files/"+filename, "Training_Raw_files/Good_Raw")
+                            shutil.copy("Validation/Training_Batch_files/"+filename, "Validation/Training_Raw_files/Good_Raw")
                             print("valid file name !! file is moved to good raw folder: {}".format(filename))
                         else:
-                            shutil.copy("Training_Batch_files/"+filename, "Training_Raw_files/Bad_Raw")
+                            shutil.copy("Validation/Training_Batch_files/"+filename, "Validation/Training_Raw_files/Bad_Raw")
                             print("Invalid file name !! file is moved to Bad raw folder: {}".format(filename))
                     else:
-                        shutil.copy("Training_Batch_files/"+filename, "Training_Raw_files/Bad_Raw")
+                        shutil.copy("Validation/Training_Batch_files/"+filename, "Validation/Training_Raw_files/Bad_Raw")
                         print("Invalid file name !! file is moved to Bad raw folder: {}".format(filename))
             
                 else:
-                    shutil.copy("Training_Batch_files/"+filename, "Training_Raw_files/Bad_Raw")
+                    shutil.copy("Validation/Training_Batch_files/"+filename, "Validation/Training_Raw_files/Bad_Raw")
                     print("Invalid file name !! file is moved to Bad raw folder: {}".format(filename))
         except Exception as emsg:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -165,12 +163,13 @@ class ValidateRawData:
     def validateColLen(self, numberOfCol):
         
         try:
-            for file in listdir("Training_Raw_files/Good_Raw/"):
+            print("Validating columns")
+            for file in listdir("Validation/Training_Raw_files/Good_Raw/"):
                 csv = pd.read_csv("Training_Raw_files/Good_Raw/"+file)
                 if csv.shape[1] == numberOfCol:
                     pass
                 else:
-                    shutil.move("Training_Raw_files/Good_Raw/"+file, "Training_Raw_files/Bad_Raw")
+                    shutil.move("Validation/Training_Raw_files/Good_Raw/"+file, "Validation/Training_Raw_files/Bad_Raw")
                     print("Invalid column length for the file ! file moved to bad raw folder : {}".format(file))
             
         except OSError as emsg:
@@ -186,15 +185,15 @@ class ValidateRawData:
             
     def validateNullValInCol(self):
         try:
-            for file in listdir("Training_Raw_files/Good_Raw/"):
-                csv = pd.read_csv("Training_Raw_files/Good_Raw/"+file)
-                count = 0
+            print("Validating Null values in column")
+            for file in listdir("Validation/Training_Raw_files/Good_Raw/"):
+                csv = pd.read_csv("Validation/Training_Raw_files/Good_Raw/"+file)
                 if any(csv.isnull().all()):
-                    shutil.move("Training_Raw_files/Good_Raw/"+file, "Training_Raw_files/Bad_Raw")
+                    shutil.move("Validation/Training_Raw_files/Good_Raw/"+file, "Validation/Training_Raw_files/Bad_Raw")
                     print("Invalid column length for the file ! File moved to bad Raw folder: {}".format(file))
                 else:
                     csv.rename(columns = {"Unnamed: 0": "Wafer"}, inplace = True)
-                    csv.to_csv("Training_Raw_files/Good_Raw/"+file, index = None, header=True)
+                    csv.to_csv("Validation/Training_Raw_files/Good_Raw/"+file, index = None, header=True)
        
         except OSError as emsg:
            exc_type, exc_obj, exc_tb = sys.exc_info()
